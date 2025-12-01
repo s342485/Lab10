@@ -25,15 +25,16 @@ class Model:
             self.G.add_node(hub)
 
         for u in self.G:
-            for v in self.G:
-                if u != v:
+            for v in self.G: #la matrice produce tutte le coppie possibili : 51*51 = 2601 combinazioni
+                if u.id < v.id: #prende solo una volta la coppia non orientata MOSSA INTELLIGENTE!
                     risultato = DAO.exist_connessione_tra(u, v) #restituisce una lista delle connessioni tra u e v e controlla se c'è una relazione tra i due nodoi
-                    if risultato:
+                    if len(risultato) >0:
                         num_spedizioni = len(risultato)
                         somma_spedizioni = sum(row["valore_merce"] for row in risultato)
                         valore_medio = somma_spedizioni / num_spedizioni
                         if valore_medio >= threshold:
                             self.G.add_edge(u, v, weight=valore_medio)
+
         return self.G
 
     def get_num_edges(self):
@@ -51,20 +52,23 @@ class Model:
         """
         """sum = 0
         for n in self.G.nodes():
-            if self.G.degree(n) > 0 : #degree è il numero di archi che toccano il nodo
+            if self.G.degree(n) > 0 : FA IL RITORNO DI NODI CON ARCHI > 0 
                 sum += 1
         return sum """
-
         return self.G.number_of_nodes() #fa il ritorno di tutti i nodi anche senza arco
 
 
-    def get_all_edges(self):
+    def get_all_edges(self, grafo):
         """
         Restituisce tutte le Tratte (gli edges) con i corrispondenti pesi
         :return: gli edges del grafo con gli attributi (il weight)
         """
-        for u,v,d in self.G.edges(data=True): #data = True permette di avere accesso al peso dell'arco
-            print("Arco:", u, "-", v, "; valore_medio:", d['weight'] )
+        edges_list = []
+        i = 1
+        for u,v,d in grafo.edges(data=True): #data = True permette di avere accesso al peso dell'arco
+            edges_list.append(f"{i}) [ {u} -> {v} -- guadagno Medio Per Spedizione: {d['weight']} ")
+            i+=1
+        return edges_list
 
 
 
